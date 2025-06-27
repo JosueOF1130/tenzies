@@ -1,9 +1,11 @@
-
+import Board from "./components/Board";
 export default function App() {
 
   return (
     <>
-      <h1>Tenzies</h1>
+      <main>
+        <Board/>
+      </main>
     </>
   )
 }
