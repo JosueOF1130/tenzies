@@ -1,12 +1,19 @@
 import Die from "./Die";
-import {useState} from "react";
+import {useState, useRef} from "react";
 import { nanoid } from 'nanoid'
 import Confetti from 'react-confetti'
 
 
 export default function Board() {
     
-    
+    const [dice, setDice] = useState(() => generateNewDice());
+    const gameWon = dice.every(die => die.locked) &&
+    dice.every(die => die.value === dice[0].value);
+
+    const rollBtn = useRef(null);
+
+
+
     function generateNewDice() {
         return new Array(10).fill(0).map(()=>({
             value: Math.ceil(Math.random() * 10),
@@ -15,14 +22,15 @@ export default function Board() {
         }));
     }
 
-    const [dice, setDice] = useState(generateNewDice());
-    const gameWon = dice.every(die => die.locked) &&
-    dice.every(die => die.value === dice[0].value);
     
     function reRollDice() {
-        setDice(prevDie => prevDie.map(die => {
+        if(gameWon){
+            setDice(generateNewDice);
+        }else{
+            setDice(prevDie => prevDie.map(die => {
             return !die.locked ? {...die, value: Math.ceil(Math.random() * 10) } : die;
         }));
+        }
     }
     
     function lockDie(id){
@@ -41,6 +49,8 @@ export default function Board() {
     const screenW = screen.width - 50;
     const screenH = screen.height - 160;
 
+
+
     return(
         <>
         {gameWon && <Confetti width={screenW} height={screenH}/>}
@@ -51,7 +61,7 @@ export default function Board() {
         <div className="dice-container">
             {diceElements}
         </div>
-        <button onClick={reRollDice} className="rollDiceBtn">{gameWon ? "New Game" : "Roll"}</button>
+        <button ref={rollBtn} onClick={reRollDice} className="rollDiceBtn">{gameWon ? "New Game" : "Roll"}</button>
         
         </>
     );
